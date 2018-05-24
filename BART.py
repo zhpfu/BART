@@ -109,7 +109,8 @@ def main():
   group = parser.add_argument_group("Temperature profile")
   group.add_argument("--PTtype", dest="PTtype",
            help="Temperature profile model [default: %(default)s]",
-           type=str, action="store", default="line", choices=("line","madhu"))
+           type=str, action="store", default="line",
+                     choices=("line","madhu","iso"))
   group.add_argument("--PTinit", dest="PTinit",
            help="Temperature profile model parameters",
            type=mu.parray, action="store", default=None)
@@ -388,7 +389,7 @@ def main():
   
   # Call bestFit submodule and make new bestFit_tconfig.cfg
   bf.callTransit(atmfile, tep_name, MCfile, stepsize, molfit, solution,
-                 refpress, tconfig, date_dir, burnin, abun_basic)
+                 refpress, tconfig, date_dir, burnin, abun_basic, PTtype)
 
   # Best-fit tconfig
   bestFit_tconfig = date_dir + 'bestFit_tconfig.cfg'

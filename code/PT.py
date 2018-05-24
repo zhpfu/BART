@@ -672,6 +672,13 @@ def PT_line(pressure, params, R_star, T_star, T_int, sma, grav):
   return temperature
 
 
+def PT_iso(p, T):
+  """
+  Returns an isothermal atmosphere at given pressures.
+  """
+  return np.ones(len(p)) * T
+
+
 def xi(gamma, tau):
   """
   Calculate Equation (14) of Line et al. (2013) Apj 775, 137
@@ -727,6 +734,8 @@ def PT_generator(p, free_params, args):
       PT, Temp = PT_NoInversion(p, *free_params)
     elif len(free_params) == 6: # With inversion layer
       PT, Temp = PT_Inversion(p,   *free_params)
+  elif args[0] == "iso":
+    Temp = PT_iso(p, free_params)     
   else:
     print("Unknown T profile type: '{:s}'".format(args[0]))
     # FINDME: throw error and stop.

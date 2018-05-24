@@ -263,7 +263,7 @@ def bestFit_tconfig(tconfig, date_dir, radius=None):
 
 
 def callTransit(atmfile, tepfile, MCfile, stepsize, molfit, solution,
-                p0, tconfig, date_dir, burnin, abun_file):
+                p0, tconfig, date_dir, burnin, abun_file, PTtype):
     """
     Call Transit to produce best-fit outputs.
     Plot MCMC posterior PT plot.
@@ -308,7 +308,7 @@ def callTransit(atmfile, tepfile, MCfile, stepsize, molfit, solution,
 
     # get PTparams and abundances factors
     nparams = len(allParams)
-    nmol = len(molfit)
+    nmol    = len(molfit)
     nradfit = int(solution == 'transit')
     nPTparams = nparams - nmol - nradfit
 
@@ -317,8 +317,13 @@ def callTransit(atmfile, tepfile, MCfile, stepsize, molfit, solution,
     T_int = 100  # K
 
     # call PT line profile to calculate temperature
-    best_T = pt.PT_line(pressure, PTparams, R_star, T_star, T_int,
-                        sma, grav*1e2)
+    if PTtype == "line":
+      best_T = pt.PT_line(pressure, PTparams, R_star, T_star, T_int,
+                          sma, grav*1e2)
+    elif PTtype == "iso":
+      best_T = pt.PT_iso(pressure, PTparams)
+    else:
+      print("Best fit TP profile plotting not implemented for this profile.")
 
     # Plot best PT profile
     plt.figure(1)
@@ -376,9 +381,14 @@ def callTransit(atmfile, tepfile, MCfile, stepsize, molfit, solution,
                 j +=1
             else:
                 pass
-        PTprofiles[k] = pt.PT_line(pressure, curr_PTparams, R_star, T_star,
-                                   T_int, sma, grav*1e2)
-
+        if PTtype == 'line':
+          PTprofiles[k] = pt.PT_line(pressure, curr_PTparams, R_star, T_star,
+                                     T_int, sma, grav*1e2)
+        elif PTtype == 'iso':
+          PTprofiles[k] = pt.PT_iso(pressure, curr_PTparams)
+        else:
+          print("PT profile distribution plot not implemented for this profile")
+          
     # get percentiles (for 1,2-sigma boundaries):
     low1 = np.percentile(PTprofiles, 16.0, axis=0)
     hi1  = np.percentile(PTprofiles, 84.0, axis=0)
